@@ -1,6 +1,6 @@
 #define BUTTON_PIN 2 // interrupt 0
 
-int ledPins[] = { 1, 2, 3 };
+int ledPins[] = { 8, 9, 10 };
 int temps[] = { 70, 80, 90 };
 int availableTemps = 3;
 
