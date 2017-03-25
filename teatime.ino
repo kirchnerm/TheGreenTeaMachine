@@ -9,7 +9,7 @@
 #define WAITING_FOR_TARGET_TEMP 1
 
 int LEDPins[] = { 8, 9, 10 };
-int temps[] = { 70, 80, 90 };
+int temps[] = { 22, 80, 90 };
 int availableTemps = 3;
 
 int targetTemp = 1; // 80 Degree default
@@ -45,7 +45,7 @@ void loop() {
   Serial.print("Temperature: ");
   Serial.println(actualTemp);
 
-  if (state == WAITING_FOR_THRESHOLD && actualTemp >= temps[targetTemp]) {
+  if (state == WAITING_FOR_THRESHOLD && actualTemp > temps[targetTemp]) {
     state = WAITING_FOR_TARGET_TEMP;
   }
 
@@ -53,12 +53,20 @@ void loop() {
     state = WAITING_FOR_THRESHOLD;
     // buzzer !!!!
     playSound();
+    setTempLeds();
   }
-  delay(1000);
+
+  // blink while waiting for target temperature
+  if (state == WAITING_FOR_TARGET_TEMP ) {
+    digitalRead(LEDPins[targetTemp]) == HIGH ? digitalWrite(LEDPins[targetTemp], LOW) : digitalWrite(LEDPins[targetTemp], HIGH);
+    delay(500);
+  } else {
+    delay(1000);
+  }
+  
 }
 
 void buttonPressed() {
-  Serial.println(previousTime);
   int buttonState = digitalRead(BUTTON);
   if ( buttonState == 1 && (millis() - previousTime) > prellTime ) {
     previousTime = millis();
@@ -66,6 +74,8 @@ void buttonPressed() {
     if (targetTemp > availableTemps - 1) {
       targetTemp = 0;
     }
+    Serial.print("New Target Temperature is: ");
+    Serial.println(temps[targetTemp]);
     setTempLeds();
   }
 }
