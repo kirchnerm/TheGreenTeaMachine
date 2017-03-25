@@ -1,4 +1,6 @@
+
 #define BUTTON_PIN 2 // interrupt 0
+#define BUZZER 5
 
 int ledPins[] = { 8, 9, 10 };
 int temps[] = { 70, 80, 90 };
@@ -21,6 +23,12 @@ void setup() {
 
   Serial.begin(9600);
   Serial.println("TeaTime!");
+
+  pinMode(BUZZER, OUTPUT);
+  tone(BUZZER, 1000); // Send 1KHz sound signal...
+  delay(1000);        // ...for 1 sec
+  noTone(BUZZER);     // Stop sound...
+  delay(1000);        // ...for 1sec
 }
 
 void loop() {
