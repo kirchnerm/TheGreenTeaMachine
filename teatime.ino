@@ -9,7 +9,7 @@
 #define WAITING_FOR_TARGET_TEMP 1
 
 int LEDPins[] = { 8, 9, 10 };
-int temps[] = { 22, 80, 90 };
+int temps[] = { 17, 22, 25 };
 int availableTemps = 3;
 
 int targetTemp = 1; // 80 Degree default
@@ -35,7 +35,7 @@ void setup() {
   Serial.println("TeaTime!");
 
   pinMode(BUZZER, OUTPUT);
-  playSound();
+  playSound(1000, 500);
   sensors.begin();
 }
 
@@ -51,8 +51,12 @@ void loop() {
 
   if (state == WAITING_FOR_TARGET_TEMP && actualTemp <= temps[targetTemp]) {
     state = WAITING_FOR_THRESHOLD;
-    // buzzer !!!!
-    playSound();
+    do {
+      for(int i=500; i<=1000; i=i+100) {
+        playSound(i, 100);
+      }
+      delay(5000);
+    } while(sensors.getTempCByIndex(0) > temps[targetTemp] - 5);
     setTempLeds();
   }
 
@@ -90,9 +94,8 @@ void setTempLeds() {
   }
 }
 
-void playSound() {
-  tone(BUZZER, 1000);
-  delay(1000);
+void playSound(int herz, int duration) {
+  tone(BUZZER, herz);
+  delay(duration);
   noTone(BUZZER);
-  delay(1000);
 }
