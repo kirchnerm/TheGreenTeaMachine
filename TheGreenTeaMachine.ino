@@ -9,11 +9,11 @@
 #define WAITING_FOR_TARGET_TEMP 1
 
 int LEDPins[] = { 8, 9, 10 };
-int temps[] = { 17, 22, 25 };
+int temps[] = { 70, 80, 90 };
 int availableTemps = 3;
 
 int targetTemp = 1; // 80 Degree default
-int state = WAITING_FOR_THRESHOLD;
+int state;
 
 unsigned int previousTime = 0, prellTime = 500;
 
@@ -37,6 +37,9 @@ void setup() {
   pinMode(BUZZER, OUTPUT);
   playSound(1000, 500);
   sensors.begin();
+  
+  // start with waiting for threshold temperature
+  state = WAITING_FOR_THRESHOLD;
 }
 
 void loop() {
@@ -45,19 +48,9 @@ void loop() {
   Serial.print("Temperature: ");
   Serial.println(actualTemp);
 
+  // activate on passing threshold
   if (state == WAITING_FOR_THRESHOLD && actualTemp > temps[targetTemp]) {
     state = WAITING_FOR_TARGET_TEMP;
-  }
-
-  if (state == WAITING_FOR_TARGET_TEMP && actualTemp <= temps[targetTemp]) {
-    state = WAITING_FOR_THRESHOLD;
-    do {
-      for(int i=500; i<=1000; i=i+100) {
-        playSound(i, 100);
-      }
-      delay(5000);
-    } while(sensors.getTempCByIndex(0) > temps[targetTemp] - 5);
-    setTempLeds();
   }
 
   // blink while waiting for target temperature
@@ -67,7 +60,18 @@ void loop() {
   } else {
     delay(1000);
   }
-  
+
+  // target temp reached
+  if (state == WAITING_FOR_TARGET_TEMP && actualTemp <= temps[targetTemp]) {
+    state = WAITING_FOR_THRESHOLD;
+    do {
+      for(int i=500; i<=1000; i=i+100) {
+        playSound(i, 100);
+      }
+      delay(5000);
+  } while(sensors.getTempCByIndex(0) > (temps[targetTemp] - 3) );
+    setTempLeds();
+  }  
 }
 
 void buttonPressed() {
