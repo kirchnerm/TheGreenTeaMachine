@@ -43,8 +43,7 @@ void setup() {
 }
 
 void loop() {
-  sensors.requestTemperatures();
-  float actualTemp = sensors.getTempCByIndex(0);
+  float actualTemp = getTemperature();
   Serial.print("Temperature: ");
   Serial.println(actualTemp);
 
@@ -55,7 +54,7 @@ void loop() {
 
   // blink while waiting for target temperature
   if (state == WAITING_FOR_TARGET_TEMP ) {
-    digitalRead(LEDPins[targetTemp]) == HIGH ? digitalWrite(LEDPins[targetTemp], LOW) : digitalWrite(LEDPins[targetTemp], HIGH);
+    toggleTargetTempLED();
     delay(500);
   } else {
     delay(1000);
@@ -68,10 +67,22 @@ void loop() {
       for(int i=500; i<=1000; i=i+100) {
         playSound(i, 100);
       }
-      delay(5000);
-  } while(sensors.getTempCByIndex(0) > (temps[targetTemp] - 3) );
+      for(int i=10; i>0; i--) {
+          toggleTargetTempLED();
+          delay(250);
+      }
+  } while(getTemperature() > (temps[targetTemp] - 5) );
     setTempLeds();
   }  
+}
+
+float getTemperature() {
+    sensors.requestTemperatures();
+    return sensors.getTempCByIndex(0);    
+}
+
+void toggleTargetTempLED() {
+    digitalRead(LEDPins[targetTemp]) == HIGH ? digitalWrite(LEDPins[targetTemp], LOW) : digitalWrite(LEDPins[targetTemp], HIGH);
 }
 
 void buttonPressed() {
