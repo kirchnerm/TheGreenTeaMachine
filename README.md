@@ -2,7 +2,7 @@
 Arduino powered GreenTeaMachine.
 
 ## Motivation
-Japanese greentea needs special temperatures for best taste.
+Japanese green tea needs special temperatures for best taste.
 
 ## How does this work
 The TheGreenTeaMachine monitors the temperature of the water and buzzers when the selected temperature is given.
